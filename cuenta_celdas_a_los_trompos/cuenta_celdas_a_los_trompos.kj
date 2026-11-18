@@ -1,0 +1,96 @@
+import rekarel.globals;
+
+class program {
+
+    void girarDerecha() {
+        turnleft();
+        turnleft();
+        turnleft();
+    }
+
+    void dejar(n) {
+        iterate(n) {
+            putbeeper();
+        }
+    }
+
+    // Karel en (1,1) mirando al sur, n = distancia.
+    // Deja n trompos en la primera celda vacia de la fila 1 y termina en (1,1) mirando al norte.
+    void deposita(n) {
+        turnleft();
+        while (nextToABeeper()) {
+            move();
+        }
+        dejar(n);
+        turnleft();
+        turnleft();
+        while (frontIsClear()) {
+            move();
+        }
+        girarDerecha();
+    }
+
+    // Karel en (1,y) mirando al sur; baja a la fila 1, deposita y sube de regreso (queda mirando al norte)
+    void baja(n) {
+        if (frontIsClear()) {
+            move();
+            baja(n);
+            move();
+        } else {
+            deposita(n);
+        }
+    }
+
+    // Karel en (c,r) mirando al oeste; n = r-1 al inicio y (r-1)+(c-1) al llegar a la columna 1
+    void oeste(n) {
+        if (frontIsClear()) {
+            move();
+            oeste(succ(n));
+            move();
+        } else {
+            turnleft();
+            baja(n);
+            girarDerecha();
+        }
+    }
+
+    // Karel en (c,1) mirando al norte; sube buscando el montón y termina en (c,1) mirando al sur
+    void sube(n) {
+        if (frontIsClear()) {
+            move();
+            if (nextToABeeper()) {
+                turnleft();
+                oeste(succ(n));
+                girarDerecha();
+            } else {
+                sube(succ(n));
+            }
+            move();
+        } else {
+            turnleft();
+            turnleft();
+        }
+    }
+
+    void procesaColumna() {
+        turnleft();
+        sube(0);
+        turnleft();
+    }
+
+    program() {
+        procesaColumna();
+        while (frontIsClear()) {
+            move();
+            procesaColumna();
+        }
+        turnleft();
+        turnleft();
+        while (frontIsClear()) {
+            move();
+        }
+        turnleft();
+        turnleft();
+        turnoff();
+    }
+}

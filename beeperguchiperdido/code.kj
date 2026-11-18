@@ -1,0 +1,67 @@
+import rekarel.globals;
+
+class program {
+
+    void girarDerecha() {
+        turnleft();
+        turnleft();
+        turnleft();
+    }
+
+    void dejar(n) {
+        iterate(n) {
+            putbeeper();
+        }
+    }
+
+    // deja k + (k-1) + ... + 1 trompos en la celda actual
+    void triangular(k) {
+        if (iszero(k)) {
+            // caso base: cuatro giros no cambian nada
+            turnleft();
+            turnleft();
+            turnleft();
+            turnleft();
+        } else {
+            dejar(k);
+            triangular(pred(k));
+        }
+    }
+
+    // Karel está en la columna n (vacía): regresa a (1,1) y deja T = n(n+1)/2
+    void fin(n) {
+        turnleft();
+        turnleft();
+        while (frontIsClear()) {
+            move();
+        }
+        triangular(n);
+    }
+
+    // mirando al este = columna nueva; mirando al norte = levantando el montón
+    void recorre(i) {
+        if (facingEast()) {
+            if (nextToABeeper()) {
+                turnleft();
+                recorre(i);
+            } else {
+                fin(i);
+            }
+        } else {
+            if (nextToABeeper()) {
+                pickbeeper();
+                recorre(i);
+                pickbeeper();
+            } else {
+                girarDerecha();
+                move();
+                recorre(succ(i));
+            }
+        }
+    }
+
+    program() {
+        recorre(1);
+        turnoff();
+    }
+}
